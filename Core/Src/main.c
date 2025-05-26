@@ -103,7 +103,7 @@ Point current_position = {0.0f, 0.0f};  // 当前位置
 float distances[3] = {0.0f, 0.0f, 0.0f};  // 三个LED的距离
 
 // LED固定位置坐标
-static const Point LED_POSITIONS[3] = {
+static const Point ps[3] = {
     {-10.0f, 0.0f},  // LED0位置
     {10.0f, 0.0f},   // LED1位置
     {0.0f, 10.0f}    // LED2位置
@@ -442,16 +442,16 @@ float calculate_distance() {
 }
 
 // 三点定位函数
-Point threePoints(float *dis, Point *ps) 
+Point threePoints() 
 {
     Point p = {0,0}; //初始化点为无效值
-    if (dis == NULL || ps == NULL)
+    if (distance == NULL || ps == NULL)
         return p;
 
     for (int i = 0; i < 3; ++i)
     {
         //检查距离是否有问题
-        if (dis[i] < 0)
+        if (distances[i] < 0)
             return p;
 
         for (int j = i + 1; j < 3; ++j) 
@@ -460,17 +460,17 @@ Point threePoints(float *dis, Point *ps)
             float p2p = (float)sqrt((ps[i].x - ps[j].x)*(ps[i].x - ps[j].x) +
                                     (ps[i].y - ps[j].y)*(ps[i].y - ps[j].y));
             //判断两圆是否相交
-            if (dis[i] + dis[j] <= p2p) 
+            if (distances[i] + distances[j] <= p2p) 
             {
                 //不相交，按比例求
-                p.x += ps[i].x + (ps[j].x - ps[i].x)*dis[i] / (dis[i] + dis[j]);
-                p.y += ps[i].y + (ps[j].y - ps[i].y)*dis[i] / (dis[i] + dis[j]);
+                p.x += ps[i].x + (ps[j].x - ps[i].x)*distances[i] / (distances[i] + distance[j]);
+                p.y += ps[i].y + (ps[j].y - ps[i].y)*distance[i] / (distance[i] + distance[j]);
             }
             else
             {
                 //相交则套用公式
                 //PC
-                float dr = p2p / 2 + (dis[i] * dis[i] - dis[j] * dis[j]) / (2 * p2p); 
+                float dr = p2p / 2 + (distance[i] * distance[i] - distance[j] * distance[j]) / (2 * p2p); 
                 //x = xp + (xq-xp) * PC / PQ
                 p.x += ps[i].x + (ps[j].x - ps[i].x)*dr / p2p;
                 //y = yp + (yq-yp) * PC / PQ
@@ -483,7 +483,7 @@ Point threePoints(float *dis, Point *ps)
     p.x /= 3;
     p.y /= 3;
 
-    return p;
+	current_position=p;
 }
 
 // 位置计算函数
